@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>jQuery Simple Html5 WYSIWYG</title>
+    <link rel="stylesheet" href="../lib/bootstrap/bootstrap.css">
+    <script src="../lib/jquery/jquery.js"></script>
+    <script src="../src/jquery.simple-html5-wysiwyg.js"></script>
+    <style>
+      .sh5wysiwyg-article, .sh5wysiwyg-toolbar {
+        display: block;
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      .sh5wysiwyg-article {
+        height: 20em;
+        border: 1px solid #666;
+        padding: 8px;
+        overflow: auto;
+        resize: none;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="wysiwyg-area"></textarea>
+    <script>
+      $(function() {
+        $("#wysiwyg-area").sh5wysiwyg({
+          bootstrap: true
+        });
+      });
+    </script>
+  </body>
+</html>

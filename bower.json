@@ -1,0 +1,33 @@
+{
+  "name": "jquery.simple-html5-wysiwyg",
+  "version": "0.0.1",
+  "authors": [
+    "Iwark <iwark02@gmail.com>"
+  ],
+  "description": "Simple jQuery WYSIWYG Plugin",
+  "main": "jquery.simple-html5-wysiwyg.js",
+  "keywords": [
+    "jQuery",
+    "wysiwyg",
+    "html5"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/Iwark/jquery.simple-html5-wysiwyg",
+  "ignore": [
+    "**/.*",
+    "**/*.html",
+    "bower_components",
+    "doc",
+    "example",
+    "lib",
+    "node_modules",
+    "src",
+    "Gruntfile.coffee",
+    "package.json",
+    "README.md"
+  ],
+  "devDependencies": {
+    "jquery": "~2.1.3",
+    "bootstrap": "~3.3.4"
+  }
+}
