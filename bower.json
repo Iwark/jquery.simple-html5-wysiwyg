@@ -1,11 +1,14 @@
 {
   "name": "jquery.simple-html5-wysiwyg",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "authors": [
     "Iwark <iwark02@gmail.com>"
   ],
   "description": "Simple jQuery WYSIWYG Plugin",
-  "main": "jquery.simple-html5-wysiwyg.js",
+  "main": [
+    "dist/jquery.simple-html5-wysiwyg.js",
+    "dist/jquery.simple-html5-wysiwyg.min.js"
+  ],
   "keywords": [
     "jQuery",
     "wysiwyg",
@@ -22,6 +25,7 @@
     "lib",
     "node_modules",
     "src",
+    "bower.json",
     "Gruntfile.coffee",
     "package.json",
     "README.md"

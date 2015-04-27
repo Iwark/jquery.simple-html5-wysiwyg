@@ -3,6 +3,12 @@ jQuery Simple Html5 WYSIWYG ![Bower Version](https://badge.fury.io/bo/jquery.sim
 
 ### Simple jQuery WYSIWYG Plugin
 
+## Installation
+
+```
+bower install jquery.simple-html5-wysiwyg
+```
+
 ## Usage
 
 1. Include jQuery (and Bootstrap if you use).
