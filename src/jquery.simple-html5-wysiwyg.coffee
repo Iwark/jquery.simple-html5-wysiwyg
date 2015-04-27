@@ -1,15 +1,17 @@
 do ($ = jQuery) ->
 
-  pluginName = "sh5wysiwyg"
+  pluginName  = "sh5wysiwyg"
 
   $.fn[pluginName] = (options) ->
     @each ->
-      unless $.data @, pluginName
-        $(@).addClass(pluginName)
-        $.data @, pluginName, new SH5wysiwyg @, options
+      unless $(this).data pluginName
+        $(this).addClass(pluginName)
+        $(this).data pluginName, new SH5wysiwyg this, options
 
-    $('.sh5wysiwyg-article').on 'focus', ->
+    # Add wrapper div to the empty article(textarea) when focused.
+    $('.sh5wysiwyg-article').off('focus').on 'focus', ->
       sel = document.getSelection()
+      return if sel.anchorNode != this
       unless $(this).html()
         $div = $("<div></div>")
         $(this).html($div)
@@ -21,12 +23,14 @@ do ($ = jQuery) ->
         if $(this).find('div').length > 1
           $(this).find('div:first').remove()
 
-    $('.sh5wysiwyg-toolbar > input').on 'click', ->
+    # Execute commands
+    $('.sh5wysiwyg-toolbar > input').off('click').on 'click', ->
       $target = $(this).parent().nextAll(".#{pluginName}:first")
       wysiwyg = $target.data pluginName
       wysiwyg.execCommand $(this).val()
 
-    $('.sh5wysiwyg-file').on 'change', (e)->
+    # Upload Image via AJAX and insert to the article(textarea).
+    $('.sh5wysiwyg-file').off('change').on 'change', (e)->
       return if document.getSelection().toString().length > 0
       e.preventDefault()
       fd = new FormData();

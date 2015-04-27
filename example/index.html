@@ -23,10 +23,12 @@
     </style>
   </head>
   <body>
-    <textarea id="wysiwyg-area"></textarea>
+    <div>
+      <textarea class="wysiwyg-area"></textarea>
+    </div>
     <script>
       $(function() {
-        $("#wysiwyg-area").sh5wysiwyg({
+        $(".wysiwyg-area").sh5wysiwyg({
           bootstrap: true
         });
       });

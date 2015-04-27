@@ -172,14 +172,17 @@
     pluginName = "sh5wysiwyg";
     return $.fn[pluginName] = function(options) {
       this.each(function() {
-        if (!$.data(this, pluginName)) {
+        if (!$(this).data(pluginName)) {
           $(this).addClass(pluginName);
-          return $.data(this, pluginName, new SH5wysiwyg(this, options));
+          return $(this).data(pluginName, new SH5wysiwyg(this, options));
         }
       });
-      $('.sh5wysiwyg-article').on('focus', function() {
+      $('.sh5wysiwyg-article').off('focus').on('focus', function() {
         var $div, range, sel;
         sel = document.getSelection();
+        if (sel.anchorNode !== this) {
+          return;
+        }
         if (!$(this).html()) {
           $div = $("<div></div>");
           $(this).html($div);
@@ -193,13 +196,13 @@
           }
         }
       });
-      $('.sh5wysiwyg-toolbar > input').on('click', function() {
+      $('.sh5wysiwyg-toolbar > input').off('click').on('click', function() {
         var $target, wysiwyg;
         $target = $(this).parent().nextAll("." + pluginName + ":first");
         wysiwyg = $target.data(pluginName);
         return wysiwyg.execCommand($(this).val());
       });
-      return $('.sh5wysiwyg-file').on('change', function(e) {
+      return $('.sh5wysiwyg-file').off('change').on('change', function(e) {
         var fd;
         if (document.getSelection().toString().length > 0) {
           return;
