@@ -1,5 +1,5 @@
 /*
- *  jquery.simple-html5-wysiwyg - v0.0.4
+ *  jquery.simple-html5-wysiwyg - v0.0.5
  *  Simple jQuery WYSIWYG Plugin
  *  https://github.com/Iwark/jquery.simple-html5-wysiwyg
  *
@@ -14,7 +14,9 @@
 
     _defaults = {
       bootstrap: false,
-      commands: ['bold', 'color', 'background-color', 'underline', 'link', 'border', 'image', 'movie'],
+      commands: ['font-size', 'bold', 'color', 'background-color', 'underline', 'link', 'border', 'image', 'movie'],
+      minFontSize: 12,
+      maxFontSize: 20,
       imageUploadTo: ''
     };
 
@@ -22,52 +24,78 @@
       this.element = element;
       this.settings = $.extend({}, _defaults, options);
       this.toolbar = new Toolbar(this.settings.commands, this.settings.bootstrap);
+      this.bootstrapClass = this.settings.bootstrap ? " form-control" : "";
       this.init();
     }
 
     SH5wysiwyg.prototype.init = function() {
       $(this.element).hide();
       $(this.element).before($(this.toolbar.element));
-      return $(this.element).before($("<article class='sh5wysiwyg-article' contentEditable='true'></article>"));
+      return $(this.element).before($("<article class='sh5wysiwyg-article" + this.bootstrapClass + "' contentEditable='true'></article>"));
     };
 
     SH5wysiwyg.prototype.execCommand = function(command) {
-      var $node, bgColor, cls, color, host, id, insertFormat, sel, thumbUrl, url;
+      var bgColor, color, currentColor, fontSize, host, id, insertFormat, interval, isSelected, newFontSize, node, nodeName, pNode, pNodeName, selection, thumbUrl, url;
+      selection = document.getSelection();
+      isSelected = selection.toString().length > 0;
+      if (isSelected) {
+        pNode = selection.anchorNode.parentNode;
+        pNodeName = pNode.nodeName.toLowerCase();
+      }
       switch (command) {
+        case "font-size":
+          if (isSelected) {
+            fontSize = parseInt(prompt('Font Size (1-7):'));
+            document.execCommand("fontSize", false, fontSize);
+            node = document.getSelection().anchorNode.parentNode;
+            nodeName = node.nodeName.toLowerCase();
+            interval = Math.round((this.settings.maxFontSize - this.settings.minFontSize) / 6 * 100) / 100;
+            newFontSize = this.settings.minFontSize + interval * (fontSize - 1);
+            if (nodeName === "font") {
+              return $(node).removeAttr("size").css("font-size", newFontSize + "px");
+            }
+          }
+          break;
         case "bold":
-          if (document.getSelection().toString().length > 0) {
+          if (isSelected) {
             return document.execCommand("bold", false);
           }
           break;
         case "color":
-          if (document.getSelection().toString().length > 0) {
-            $node = $(document.getSelection().anchorNode.parentNode);
-            color = prompt('Color:', $node.css('color'));
+          if (isSelected) {
+            currentColor = pNodeName === "font" ? $(pNode).css('color') : "";
+            color = prompt('Color:', currentColor);
             if (color === "") {
-              return document.execCommand("removeFormat", false, "foreColor");
+              if (pNodeName === "font") {
+                return $(pNode).css("color", "");
+              }
             } else {
-              return document.execCommand("foreColor", false, color);
+              document.execCommand("foreColor", false, color);
+              node = document.getSelection().anchorNode.parentNode;
+              nodeName = node.nodeName.toLowerCase();
+              if (nodeName === "font") {
+                return $(node).removeAttr("color").css("color", color);
+              }
             }
           }
           break;
         case "background-color":
-          if (document.getSelection().toString().length > 0) {
-            $node = $(document.getSelection().anchorNode.parentNode);
-            bgColor = prompt('Background Color:', $node.css('background-color'));
+          if (isSelected) {
+            bgColor = prompt('Background Color:', $(pNode).css('background-color'));
             if (bgColor === "") {
-              return $node.css('background-color', "");
+              return $(pNode).css('background-color', "");
             } else {
               return document.execCommand('backColor', false, bgColor);
             }
           }
           break;
         case "underline":
-          if (document.getSelection().toString().length > 0) {
+          if (isSelected) {
             return document.execCommand("underline", false);
           }
           break;
         case "link":
-          if (document.getSelection().toString().length > 0) {
+          if (isSelected) {
             url = prompt('URL:');
             if (url === "") {
               return document.execCommand('unlink', false);
@@ -77,25 +105,23 @@
           }
           break;
         case "border":
-          sel = document.getSelection();
-          if (sel.toString().length > 0) {
-            $node = $(sel.anchorNode.parentNode);
-            if ($node.hasClass('sh5wysiwyg-frame')) {
-              $(sel.anchorNode.parentNode).css({
+          if (isSelected) {
+            if ($(pNode).hasClass('sh5wysiwyg-frame')) {
+              $(pNode).css({
                 display: 'block',
                 border: 'none',
                 padding: 0,
                 margin: 0
               });
             } else {
-              $(sel.anchorNode.parentNode).css({
+              $(pNode).css({
                 display: 'inline-block',
                 border: '1px solid #777',
                 padding: '4px',
                 margin: '4px'
               });
             }
-            return $node.toggleClass('sh5wysiwyg-frame');
+            return $(pNode).toggleClass('sh5wysiwyg-frame');
           }
           break;
         case "image":
@@ -113,10 +139,8 @@
           }
           break;
         case "class":
-          sel = document.getSelection();
-          if (sel.toString().length > 0) {
-            cls = prompt('Class Name:', sel.anchorNode.parentNode.className);
-            return sel.anchorNode.parentNode.className = cls;
+          if (isSelected) {
+            return pNode.className = prompt('Class Name:', pNode.className);
           }
       }
     };

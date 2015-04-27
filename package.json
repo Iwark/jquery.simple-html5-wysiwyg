@@ -1,6 +1,6 @@
 {
   "name": "jquery.simple-html5-wysiwyg",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Simple jQuery WYSIWYG Plugin",
   "main": "jquery.simple-html5-wysiwyg.js",
   "scripts": {

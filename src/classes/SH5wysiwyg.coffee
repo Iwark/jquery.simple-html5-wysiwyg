@@ -5,6 +5,7 @@ class SH5wysiwyg
   _defaults =
     bootstrap: false
     commands: [
+      'font-size',
       'bold',
       'color',
       'background-color',
@@ -14,74 +15,93 @@ class SH5wysiwyg
       'image',
       'movie'
     ]
+    minFontSize: 12
+    maxFontSize: 20
     imageUploadTo: ''
 
   constructor: (@element, options) ->
     @settings  = $.extend {}, _defaults, options
     @toolbar   = new Toolbar(@settings.commands, @settings.bootstrap)
+    @bootstrapClass = if @settings.bootstrap then " form-control" else ""
     @init()
 
   init: ->
     $(@element).hide()
     
     $(@element).before($(@toolbar.element))
-    $(@element).before($("<article class='sh5wysiwyg-article' contentEditable='true'></article>"))
+    $(@element).before($("<article class='sh5wysiwyg-article#{@bootstrapClass}' contentEditable='true'></article>"))
 
   execCommand: (command)->
+
+    selection  = document.getSelection()
+    isSelected = selection.toString().length > 0
+    if isSelected
+      pNode      = selection.anchorNode.parentNode
+      pNodeName  = pNode.nodeName.toLowerCase()
+
     switch command
       
+      when "font-size"
+        if isSelected
+          fontSize = parseInt(prompt('Font Size (1-7):'))
+          document.execCommand("fontSize", false, fontSize)
+          node = document.getSelection().anchorNode.parentNode
+          nodeName = node.nodeName.toLowerCase()
+          interval = Math.round((@settings.maxFontSize - @settings.minFontSize) / 6 * 100) / 100
+          newFontSize = @settings.minFontSize + interval * (fontSize - 1)
+          $(node).removeAttr("size").css("font-size", "#{newFontSize}px") if nodeName == "font"
+
       when "bold"
-        if document.getSelection().toString().length > 0
+        if isSelected
           document.execCommand("bold", false)
       
       when "color"
-        if document.getSelection().toString().length > 0
-          $node = $(document.getSelection().anchorNode.parentNode)
-          color = prompt('Color:', $node.css('color'))
+        if isSelected
+          currentColor = if (pNodeName == "font") then $(pNode).css('color') else ""
+          color = prompt('Color:', currentColor)
           if color == ""
-            document.execCommand("removeFormat", false, "foreColor")
+            $(pNode).css("color", "") if pNodeName == "font"
           else
             document.execCommand("foreColor", false, color)
+            node = document.getSelection().anchorNode.parentNode
+            nodeName = node.nodeName.toLowerCase()
+            $(node).removeAttr("color").css("color", color) if nodeName == "font"
       
       when "background-color"
-        if document.getSelection().toString().length > 0
-          $node = $(document.getSelection().anchorNode.parentNode)
-          bgColor = prompt('Background Color:', $node.css('background-color'))
+        if isSelected
+          bgColor = prompt('Background Color:', $(pNode).css('background-color'))
           if bgColor == ""
-            $node.css('background-color', "")
+            $(pNode).css('background-color', "")
           else
             document.execCommand('backColor', false, bgColor)
       
       when "underline"
-        if document.getSelection().toString().length > 0
+        if isSelected
           document.execCommand("underline", false)
       
       when "link"
-        if document.getSelection().toString().length > 0
+        if isSelected
           url = prompt('URL:')
           if url == ""
             document.execCommand('unlink',false)
           else
             document.execCommand('createLink',false,url)
-            
       
       when "border"
-        sel = document.getSelection()
-        if sel.toString().length > 0
-          $node = $(sel.anchorNode.parentNode)
-          if $node.hasClass 'sh5wysiwyg-frame'
-            $(sel.anchorNode.parentNode).css
+        if isSelected
+          if $(pNode).hasClass 'sh5wysiwyg-frame'
+            $(pNode).css
               display: 'block'
               border: 'none'
               padding: 0
               margin: 0
           else
-            $(sel.anchorNode.parentNode).css
+            $(pNode).css
               display: 'inline-block'
               border: '1px solid #777'
               padding: '4px'
               margin: '4px'
-          $node.toggleClass 'sh5wysiwyg-frame'
+          $(pNode).toggleClass 'sh5wysiwyg-frame'
       
       when "image"
         $('.sh5wysiwyg-file:first').trigger('click')
@@ -98,7 +118,5 @@ class SH5wysiwyg
             document.execCommand('insertHTML', false, insertFormat)
 
       when "class"
-        sel = document.getSelection()
-        if sel.toString().length > 0
-          cls = prompt('Class Name:', sel.anchorNode.parentNode.className)
-          sel.anchorNode.parentNode.className = cls
+        if isSelected
+          pNode.className = prompt('Class Name:', pNode.className)
