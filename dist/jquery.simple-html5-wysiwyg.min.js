@@ -1,5 +1,5 @@
 /*
- *  jquery.simple-html5-wysiwyg - v0.0.2
+ *  jquery.simple-html5-wysiwyg - v0.0.3
  *  Simple jQuery WYSIWYG Plugin
  *  https://github.com/Iwark/jquery.simple-html5-wysiwyg
  *
