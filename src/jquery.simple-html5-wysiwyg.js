@@ -194,9 +194,9 @@
         }
       });
       $('.sh5wysiwyg-toolbar > input').on('click', function() {
-        var target, wysiwyg;
-        target = $(this).parent().nextAll("." + pluginName + ":first");
-        wysiwyg = $.data(target[0], pluginName);
+        var $target, wysiwyg;
+        $target = $(this).parent().nextAll("." + pluginName + ":first");
+        wysiwyg = $target.data(pluginName);
         return wysiwyg.execCommand($(this).val());
       });
       return $('.sh5wysiwyg-file').on('change', function(e) {

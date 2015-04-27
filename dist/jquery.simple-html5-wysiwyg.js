@@ -1,5 +1,5 @@
 /*
- *  jquery.simple-html5-wysiwyg - v0.0.5
+ *  jquery.simple-html5-wysiwyg - v0.0.6
  *  Simple jQuery WYSIWYG Plugin
  *  https://github.com/Iwark/jquery.simple-html5-wysiwyg
  *
@@ -202,9 +202,9 @@
         }
       });
       $('.sh5wysiwyg-toolbar > input').on('click', function() {
-        var target, wysiwyg;
-        target = $(this).parent().nextAll("." + pluginName + ":first");
-        wysiwyg = $.data(target[0], pluginName);
+        var $target, wysiwyg;
+        $target = $(this).parent().nextAll("." + pluginName + ":first");
+        wysiwyg = $target.data(pluginName);
         return wysiwyg.execCommand($(this).val());
       });
       return $('.sh5wysiwyg-file').on('change', function(e) {

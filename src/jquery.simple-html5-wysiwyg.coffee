@@ -22,8 +22,8 @@ do ($ = jQuery) ->
           $(this).find('div:first').remove()
 
     $('.sh5wysiwyg-toolbar > input').on 'click', ->
-      target = $(this).parent().nextAll(".#{pluginName}:first")
-      wysiwyg = $.data target[0], pluginName
+      $target = $(this).parent().nextAll(".#{pluginName}:first")
+      wysiwyg = $target.data pluginName
       wysiwyg.execCommand $(this).val()
 
     $('.sh5wysiwyg-file').on 'change', (e)->
