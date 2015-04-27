@@ -38,8 +38,7 @@ do ($ = jQuery) ->
         processData: false
         contentType: false
         dataType: "json"
-        success: (data)->
-          json = JSON.parse(data)
+        success: (json)->
           document.execCommand('insertImage',false,json.url)
-        error: (e)->
-          alert "Error: #{e}"
+        error: (jqXHR, textStatus, errorThrown)->
+          alert "Error textStatus:#{textStatus}, errorThrown:#{errorThrown}"

@@ -1,5 +1,5 @@
 /*
- *  jquery.simple-html5-wysiwyg - v0.0.3
+ *  jquery.simple-html5-wysiwyg - v0.0.4
  *  Simple jQuery WYSIWYG Plugin
  *  https://github.com/Iwark/jquery.simple-html5-wysiwyg
  *
@@ -198,13 +198,11 @@
           processData: false,
           contentType: false,
           dataType: "json",
-          success: function(data) {
-            var json;
-            json = JSON.parse(data);
+          success: function(json) {
             return document.execCommand('insertImage', false, json.url);
           },
-          error: function(e) {
-            return alert("Error: " + e);
+          error: function(jqXHR, textStatus, errorThrown) {
+            return alert("Error textStatus:" + textStatus + ", errorThrown:" + errorThrown);
           }
         });
       });
