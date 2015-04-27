@@ -27,7 +27,7 @@ do ($ = jQuery) ->
       wysiwyg.execCommand $(this).val()
 
     $('.sh5wysiwyg-file').on 'change', (e)->
-      return unless document.getSelection().toString().length > 0
+      return if document.getSelection().toString().length > 0
       e.preventDefault()
       fd = new FormData();
       fd.append("file", this.files[0])
@@ -37,7 +37,9 @@ do ($ = jQuery) ->
         data: fd
         processData: false
         contentType: false
-        success: (url)->
-          document.execCommand('insertImage',false,url)
+        dataType: "json"
+        success: (data)->
+          json = JSON.parse(data)
+          document.execCommand('insertImage',false,json.url)
         error: (e)->
           alert "Error: #{e}"

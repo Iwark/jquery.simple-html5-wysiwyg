@@ -177,7 +177,7 @@
       });
       return $('.sh5wysiwyg-file').on('change', function(e) {
         var fd;
-        if (!(document.getSelection().toString().length > 0)) {
+        if (document.getSelection().toString().length > 0) {
           return;
         }
         e.preventDefault();
@@ -189,8 +189,11 @@
           data: fd,
           processData: false,
           contentType: false,
-          success: function(url) {
-            return document.execCommand('insertImage', false, url);
+          dataType: "json",
+          success: function(data) {
+            var json;
+            json = JSON.parse(data);
+            return document.execCommand('insertImage', false, json.url);
           },
           error: function(e) {
             return alert("Error: " + e);
