@@ -23,7 +23,7 @@
     SH5wysiwyg.prototype.init = function() {
       $(this.element).hide();
       $(this.element).before($(this.toolbar.element));
-      return $(this.element).before($("<article class='sh5wysiwyg-article" + this.bootstrapClass + "' contentEditable='true'></article>"));
+      return $(this.element).before($("<article class='sh5wysiwyg-article" + this.bootstrapClass + "' contentEditable='true'>" + ($(this.element).val()) + "</article>"));
     };
 
     SH5wysiwyg.prototype.execCommand = function(command) {

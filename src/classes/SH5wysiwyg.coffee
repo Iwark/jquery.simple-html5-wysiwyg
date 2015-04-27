@@ -27,9 +27,8 @@ class SH5wysiwyg
 
   init: ->
     $(@element).hide()
-    
     $(@element).before($(@toolbar.element))
-    $(@element).before($("<article class='sh5wysiwyg-article#{@bootstrapClass}' contentEditable='true'></article>"))
+    $(@element).before($("<article class='sh5wysiwyg-article#{@bootstrapClass}' contentEditable='true'>#{$(@element).val()}</article>"))
 
   execCommand: (command)->
 
