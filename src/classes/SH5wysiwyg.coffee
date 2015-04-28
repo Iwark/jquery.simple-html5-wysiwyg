@@ -56,7 +56,7 @@ class SH5wysiwyg
       movie = self.getYoutubeMovie(youtubeId)
       $(this).replaceWith(movie)
 
-    $(@source).val $source[0]
+    $(@source).val $source.html()
 
   getNiconicoThumbImg: (url)->
     return "" unless url.match(/^http:\/\/(?:www\.nicovideo\.jp\/watch|nico\.ms)\/[a-z][a-z](\d+)/)

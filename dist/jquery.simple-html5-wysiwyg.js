@@ -1,5 +1,5 @@
 /*
- *  jquery.simple-html5-wysiwyg - v0.1.2
+ *  jquery.simple-html5-wysiwyg - v0.1.3
  *  Simple jQuery WYSIWYG Plugin
  *  https://github.com/Iwark/jquery.simple-html5-wysiwyg
  *
@@ -62,7 +62,7 @@
         movie = self.getYoutubeMovie(youtubeId);
         return $(this).replaceWith(movie);
       });
-      return $(this.source).val($source[0]);
+      return $(this.source).val($source.html());
     };
 
     SH5wysiwyg.prototype.getNiconicoThumbImg = function(url) {

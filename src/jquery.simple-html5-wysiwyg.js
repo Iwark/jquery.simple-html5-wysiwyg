@@ -54,7 +54,7 @@
         movie = self.getYoutubeMovie(youtubeId);
         return $(this).replaceWith(movie);
       });
-      return $(this.source).val($source[0]);
+      return $(this.source).val($source.html());
     };
 
     SH5wysiwyg.prototype.getNiconicoThumbImg = function(url) {
