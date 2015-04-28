@@ -1,5 +1,5 @@
 /*
- *  jquery.simple-html5-wysiwyg - v0.1.0
+ *  jquery.simple-html5-wysiwyg - v0.1.1
  *  Simple jQuery WYSIWYG Plugin
  *  https://github.com/Iwark/jquery.simple-html5-wysiwyg
  *
@@ -265,6 +265,7 @@
           $(this).html($div);
           range = document.createRange();
           range.selectNode($div[0]);
+          sel.removeAllRanges();
           sel.addRange(range);
           $(this).html('');
           document.execCommand('insertParagraph', false, null);

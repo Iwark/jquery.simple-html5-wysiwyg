@@ -257,6 +257,7 @@
           $(this).html($div);
           range = document.createRange();
           range.selectNode($div[0]);
+          sel.removeAllRanges();
           sel.addRange(range);
           $(this).html('');
           document.execCommand('insertParagraph', false, null);
