@@ -295,10 +295,9 @@
         });
       });
       return $("." + pluginName).parents('form').off('submit.sh5').on('submit.sh5', function() {
-        $("." + pluginName).each(function() {
+        return $("." + pluginName).each(function() {
           return $(this).data(pluginName).setSourceVal().convertThumbToMovie();
         });
-        return false;
       });
     };
   })(jQuery);

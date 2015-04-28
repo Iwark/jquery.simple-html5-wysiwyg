@@ -1,5 +1,5 @@
 /*
- *  jquery.simple-html5-wysiwyg - v0.0.8
+ *  jquery.simple-html5-wysiwyg - v0.1.0
  *  Simple jQuery WYSIWYG Plugin
  *  https://github.com/Iwark/jquery.simple-html5-wysiwyg
  *
@@ -303,10 +303,9 @@
         });
       });
       return $("." + pluginName).parents('form').off('submit.sh5').on('submit.sh5', function() {
-        $("." + pluginName).each(function() {
+        return $("." + pluginName).each(function() {
           return $(this).data(pluginName).setSourceVal().convertThumbToMovie();
         });
-        return false;
       });
     };
   })(jQuery);
