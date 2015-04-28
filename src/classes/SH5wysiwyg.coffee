@@ -31,6 +31,8 @@ class SH5wysiwyg
     $(@source).hide()
     $(@source).before($(@toolbar.element))
     $(@source).before(@$article)
+    if @$article.html().length > 0
+      @convertMovieToThumb()
 
   setSourceVal: ->
     $(@source).val @$article.html()
@@ -58,6 +60,24 @@ class SH5wysiwyg
 
     $(@source).val $source.html()
 
+  convertMovieToThumb: ->
+    $html = $("<div>" + @$article.html() + "</div>")
+    self = this
+
+    # Niconico Movie
+    $html.find('div[name="wysiwyg-insert-niconico-movie"]').each ->
+      url = $(this).find('noscript').html().match(/href="(.*?)"/)[1]
+      thumb = self.getNiconicoThumbImg(url)
+      $(this).replaceWith(thumb)
+
+    # Youtube
+    $html.find('object.wysiwyg-youtube').each ->
+      url = $(this).attr('data')
+      thumb = self.getYoutubeThumbImg(url)
+      $(this).replaceWith(thumb)
+
+    @$article.html $html.html()
+
   getNiconicoThumbImg: (url)->
     return "" unless url.match(/^http:\/\/(?:www\.nicovideo\.jp\/watch|nico\.ms)\/[a-z][a-z](\d+)/)
     id = RegExp.$1
@@ -77,7 +97,7 @@ class SH5wysiwyg
       """
 
   getYoutubeThumbImg: (url)->
-    if url.match(/youtube\.com\/.*?v=(.*?)(\&|$)/) || url.match(/youtu\.be\/(.*?)(\&|$)/)
+    if url.match(/youtube\.com\/.*?v(?:=|\/)(.*?)(\&|$)/) || url.match(/youtu\.be\/(.*?)(\&|$)/)
       youtubeId = RegExp.$1
     else
       return ""

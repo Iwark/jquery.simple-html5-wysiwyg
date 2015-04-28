@@ -25,7 +25,10 @@
     SH5wysiwyg.prototype.init = function() {
       $(this.source).hide();
       $(this.source).before($(this.toolbar.element));
-      return $(this.source).before(this.$article);
+      $(this.source).before(this.$article);
+      if (this.$article.html().length > 0) {
+        return this.convertMovieToThumb();
+      }
     };
 
     SH5wysiwyg.prototype.setSourceVal = function() {
@@ -57,6 +60,25 @@
       return $(this.source).val($source.html());
     };
 
+    SH5wysiwyg.prototype.convertMovieToThumb = function() {
+      var $html, self;
+      $html = $("<div>" + this.$article.html() + "</div>");
+      self = this;
+      $html.find('div[name="wysiwyg-insert-niconico-movie"]').each(function() {
+        var thumb, url;
+        url = $(this).find('noscript').html().match(/href="(.*?)"/)[1];
+        thumb = self.getNiconicoThumbImg(url);
+        return $(this).replaceWith(thumb);
+      });
+      $html.find('object.wysiwyg-youtube').each(function() {
+        var thumb, url;
+        url = $(this).attr('data');
+        thumb = self.getYoutubeThumbImg(url);
+        return $(this).replaceWith(thumb);
+      });
+      return this.$article.html($html.html());
+    };
+
     SH5wysiwyg.prototype.getNiconicoThumbImg = function(url) {
       var host, id, thumbImg, thumbUrl;
       if (!url.match(/^http:\/\/(?:www\.nicovideo\.jp\/watch|nico\.ms)\/[a-z][a-z](\d+)/)) {
@@ -76,7 +98,7 @@
 
     SH5wysiwyg.prototype.getYoutubeThumbImg = function(url) {
       var youtubeId;
-      if (url.match(/youtube\.com\/.*?v=(.*?)(\&|$)/) || url.match(/youtu\.be\/(.*?)(\&|$)/)) {
+      if (url.match(/youtube\.com\/.*?v(?:=|\/)(.*?)(\&|$)/) || url.match(/youtu\.be\/(.*?)(\&|$)/)) {
         youtubeId = RegExp.$1;
       } else {
         return "";
