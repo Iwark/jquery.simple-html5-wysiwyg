@@ -33,10 +33,67 @@ class SH5wysiwyg
     $(@source).before(@$article)
 
   setSourceVal: ->
-    $(@source).val(@$article.html())
+    $(@source).val @$article.html()
+    return this
 
   setEditorVal: ->
-    @$article.html($(@source).val())
+    @$article.html $(@source).val()
+    return this
+
+  convertThumbToMovie: ->
+    $source = $($(@source).val())
+    self = this
+    
+    # Niconico Movie
+    $source.find('img.sh5wysiwyg-niconico-thumb').each ->
+      url = $(this).data('url')
+      movie = self.getNiconicoMovie(url)
+      $(this).replaceWith(movie)
+
+    # Youtube
+    $source.find('img.sh5wysiwyg-youtube-thumb').each ->
+      youtubeId = $(this).data('youtube-id')
+      movie = self.getYoutubeMovie(youtubeId)
+      $(this).replaceWith(movie)
+
+    $(@source).val $source[0]
+
+  getNiconicoThumbImg: (url)->
+    return "" unless url.match(/^http:\/\/(?:www\.nicovideo\.jp\/watch|nico\.ms)\/[a-z][a-z](\d+)/)
+    id = RegExp.$1
+    host = parseInt(id)%4 + 1
+    thumbUrl = "http://tn-skr#{host}.smilevideo.jp/smile?i=#{id}"
+    thumbImg = "<img class='sh5wysiwyg-niconico-thumb' style='width:425px; height:355px;' " +
+      "src='#{thumbUrl}' data-url='#{url}'>"
+
+  getNiconicoMovie: (url)->
+    replacedUrl = url.replace("watch", "thumb_watch").replace("www", "ext")
+    niconico =
+      """
+      <div name="wysiwyg-insert-niconico-movie">  
+        <script type="text/javascript" src="#{replacedUrl}"></script>
+        <noscript><a href="#{url}"></a></noscript>
+      </div>
+      """
+
+  getYoutubeThumbImg: (url)->
+    if url.match(/youtube\.com\/.*?v=(.*?)(\&|$)/) || url.match(/youtu\.be\/(.*?)(\&|$)/)
+      youtubeId = RegExp.$1
+    else
+      return ""
+    "<img class='sh5wysiwyg-youtube-thumb' style='width:425px; height:355px;' " +
+      "src='http://img.youtube.com/vi/#{youtubeId}/1.jpg' data-youtube-id='#{youtubeId}'>"
+
+  getYoutubeMovie: (youtubeId)->
+    youtube = 
+      """
+      <object class="wysiwyg-youtube" width="425" height="355" type="application/x-shockwave-flash" data="http://www.youtube.com/v/#{youtubeId}">
+        <param name="movie" value="http://www.youtube.com/v/#{youtubeId}" />
+        <param value="http://www.youtube.com/v/#{youtubeId}" name="movie" />
+        <param value="transparent" name="wmode" />
+        <param value="http://img.youtube.com/vi/#{youtubeId}/1.jpg" name="wysiwyg-insert-youtube-flash"></param>
+      </object>
+      """
 
   execCommand: (command)->
 
@@ -114,15 +171,15 @@ class SH5wysiwyg
         $('.sh5wysiwyg-file:first').trigger('click')
       
       when "movie"
-        url = prompt('URL:', '')
-        if url
-          if url.match(/^http:\/\/(?:www\.nicovideo\.jp\/watch|nico\.ms)\/[a-z][a-z](\d+)/)
-            id = RegExp.$1
-            host = parseInt(id)%4 + 1
-            thumbUrl = "http://tn-skr#{host}.smilevideo.jp/smile?i=#{id}"
-            insertFormat =  "<img class='sh5wysiwyg-niconico' src='#{thumbUrl}' data-url='#{url}'>"
-            # insertFormat += '<script type="text/javascript" src="http://ext.nicovideo.jp/thumb_watch/sm23937144"></script><noscript><a href="http://www.nicovideo.jp/watch/sm23937144?ref=top_push_flog"></a></noscript>'
-            document.execCommand('insertHTML', false, insertFormat)
+        if url = prompt('URL:', '')
+
+          # Youtube
+          if url.match(/youtube\.com/) || url.match(/youtu\.be/)
+            document.execCommand('insertHTML', false, @getYoutubeThumbImg(url))
+
+          # Niconico Movie
+          if url.match(/^http:\/\/(?:www\.nicovideo\.jp\/watch|nico\.ms)\/[a-z][a-z](\d+)/)            
+            document.execCommand('insertHTML', false, @getNiconicoThumbImg(url))
 
       when "source"
         @setSourceVal()

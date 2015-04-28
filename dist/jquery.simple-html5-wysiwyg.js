@@ -37,15 +37,68 @@
     };
 
     SH5wysiwyg.prototype.setSourceVal = function() {
-      return $(this.source).val(this.$article.html());
+      $(this.source).val(this.$article.html());
+      return this;
     };
 
     SH5wysiwyg.prototype.setEditorVal = function() {
-      return this.$article.html($(this.source).val());
+      this.$article.html($(this.source).val());
+      return this;
+    };
+
+    SH5wysiwyg.prototype.convertThumbToMovie = function() {
+      var $source, self;
+      $source = $($(this.source).val());
+      self = this;
+      $source.find('img.sh5wysiwyg-niconico-thumb').each(function() {
+        var movie, url;
+        url = $(this).data('url');
+        movie = self.getNiconicoMovie(url);
+        return $(this).replaceWith(movie);
+      });
+      $source.find('img.sh5wysiwyg-youtube-thumb').each(function() {
+        var movie, youtubeId;
+        youtubeId = $(this).data('youtube-id');
+        movie = self.getYoutubeMovie(youtubeId);
+        return $(this).replaceWith(movie);
+      });
+      return $(this.source).val($source[0]);
+    };
+
+    SH5wysiwyg.prototype.getNiconicoThumbImg = function(url) {
+      var host, id, thumbImg, thumbUrl;
+      if (!url.match(/^http:\/\/(?:www\.nicovideo\.jp\/watch|nico\.ms)\/[a-z][a-z](\d+)/)) {
+        return "";
+      }
+      id = RegExp.$1;
+      host = parseInt(id) % 4 + 1;
+      thumbUrl = "http://tn-skr" + host + ".smilevideo.jp/smile?i=" + id;
+      return thumbImg = "<img class='sh5wysiwyg-niconico-thumb' style='width:425px; height:355px;' " + ("src='" + thumbUrl + "' data-url='" + url + "'>");
+    };
+
+    SH5wysiwyg.prototype.getNiconicoMovie = function(url) {
+      var niconico, replacedUrl;
+      replacedUrl = url.replace("watch", "thumb_watch").replace("www", "ext");
+      return niconico = "<div name=\"wysiwyg-insert-niconico-movie\">  \n  <script type=\"text/javascript\" src=\"" + replacedUrl + "\"></script>\n  <noscript><a href=\"" + url + "\"></a></noscript>\n</div>";
+    };
+
+    SH5wysiwyg.prototype.getYoutubeThumbImg = function(url) {
+      var youtubeId;
+      if (url.match(/youtube\.com\/.*?v=(.*?)(\&|$)/) || url.match(/youtu\.be\/(.*?)(\&|$)/)) {
+        youtubeId = RegExp.$1;
+      } else {
+        return "";
+      }
+      return "<img class='sh5wysiwyg-youtube-thumb' style='width:425px; height:355px;' " + ("src='http://img.youtube.com/vi/" + youtubeId + "/1.jpg' data-youtube-id='" + youtubeId + "'>");
+    };
+
+    SH5wysiwyg.prototype.getYoutubeMovie = function(youtubeId) {
+      var youtube;
+      return youtube = "<object class=\"wysiwyg-youtube\" width=\"425\" height=\"355\" type=\"application/x-shockwave-flash\" data=\"http://www.youtube.com/v/" + youtubeId + "\">\n  <param name=\"movie\" value=\"http://www.youtube.com/v/" + youtubeId + "\" />\n  <param value=\"http://www.youtube.com/v/" + youtubeId + "\" name=\"movie\" />\n  <param value=\"transparent\" name=\"wmode\" />\n  <param value=\"http://img.youtube.com/vi/" + youtubeId + "/1.jpg\" name=\"wysiwyg-insert-youtube-flash\"></param>\n</object>";
     };
 
     SH5wysiwyg.prototype.execCommand = function(command) {
-      var bgColor, color, currentColor, fontSize, host, id, insertFormat, interval, isSelected, newFontSize, node, nodeName, pNode, pNodeName, selection, thumbUrl, url;
+      var bgColor, color, currentColor, fontSize, interval, isSelected, newFontSize, node, nodeName, pNode, pNodeName, selection, url;
       selection = document.getSelection();
       isSelected = selection.toString().length > 0;
       if (isSelected) {
@@ -137,14 +190,12 @@
         case "image":
           return $('.sh5wysiwyg-file:first').trigger('click');
         case "movie":
-          url = prompt('URL:', '');
-          if (url) {
+          if (url = prompt('URL:', '')) {
+            if (url.match(/youtube\.com/) || url.match(/youtu\.be/)) {
+              document.execCommand('insertHTML', false, this.getYoutubeThumbImg(url));
+            }
             if (url.match(/^http:\/\/(?:www\.nicovideo\.jp\/watch|nico\.ms)\/[a-z][a-z](\d+)/)) {
-              id = RegExp.$1;
-              host = parseInt(id) % 4 + 1;
-              thumbUrl = "http://tn-skr" + host + ".smilevideo.jp/smile?i=" + id;
-              insertFormat = "<img class='sh5wysiwyg-niconico' src='" + thumbUrl + "' data-url='" + url + "'>";
-              return document.execCommand('insertHTML', false, insertFormat);
+              return document.execCommand('insertHTML', false, this.getNiconicoThumbImg(url));
             }
           }
           break;
@@ -209,9 +260,6 @@
       $('.sh5wysiwyg-article').off('focus.sh5').on('focus.sh5', function() {
         var $div, range, sel;
         sel = document.getSelection();
-        if (sel.anchorNode !== this) {
-          return;
-        }
         if (!$(this).html()) {
           $div = $("<div></div>");
           $(this).html($div);
@@ -256,7 +304,7 @@
       });
       return $("." + pluginName).parents('form').off('submit.sh5').on('submit.sh5', function() {
         $("." + pluginName).each(function() {
-          return $(this).data(pluginName).setSourceVal();
+          return $(this).data(pluginName).setSourceVal().convertThumbToMovie();
         });
         return false;
       });

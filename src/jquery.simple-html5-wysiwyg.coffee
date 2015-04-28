@@ -11,7 +11,6 @@ do ($ = jQuery) ->
     # Add wrapper div to the empty article(textarea) when focused.
     $('.sh5wysiwyg-article').off('focus.sh5').on 'focus.sh5', ->
       sel = document.getSelection()
-      return if sel.anchorNode != this
       unless $(this).html()
         $div = $("<div></div>")
         $(this).html($div)
@@ -50,5 +49,4 @@ do ($ = jQuery) ->
     # Set articles value to textareas.
     $(".#{pluginName}").parents('form').off('submit.sh5').on 'submit.sh5', ->
       $(".#{pluginName}").each ->
-        $(this).data(pluginName).setSourceVal()
-      return false
+        $(this).data(pluginName).setSourceVal().convertThumbToMovie()
