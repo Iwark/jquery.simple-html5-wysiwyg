@@ -13,22 +13,30 @@ class SH5wysiwyg
       'link',
       'border',
       'image',
-      'movie'
+      'movie',
+      'source'
     ]
     minFontSize: 12
     maxFontSize: 20
     imageUploadTo: ''
 
-  constructor: (@element, options) ->
-    @settings  = $.extend {}, _defaults, options
-    @toolbar   = new Toolbar(@settings.commands, @settings.bootstrap)
-    @bootstrapClass = if @settings.bootstrap then " form-control" else ""
+  constructor: (@source, options) ->
+    @settings      = $.extend {}, _defaults, options
+    @toolbar       = new Toolbar(@settings.commands, @settings.bootstrap)
+    bootstrapClass = if @settings.bootstrap then " form-control" else ""
+    @$article       = $("<article class='sh5wysiwyg-article#{bootstrapClass}' contentEditable='true'>#{$(@source).val()}</article>")
     @init()
 
   init: ->
-    $(@element).hide()
-    $(@element).before($(@toolbar.element))
-    $(@element).before($("<article class='sh5wysiwyg-article#{@bootstrapClass}' contentEditable='true'>#{$(@element).val()}</article>"))
+    $(@source).hide()
+    $(@source).before($(@toolbar.element))
+    $(@source).before(@$article)
+
+  setSourceVal: ->
+    $(@source).val(@$article.html())
+
+  setEditorVal: ->
+    @$article.html($(@source).val())
 
   execCommand: (command)->
 
@@ -116,6 +124,16 @@ class SH5wysiwyg
             # insertFormat += '<script type="text/javascript" src="http://ext.nicovideo.jp/thumb_watch/sm23937144"></script><noscript><a href="http://www.nicovideo.jp/watch/sm23937144?ref=top_push_flog"></a></noscript>'
             document.execCommand('insertHTML', false, insertFormat)
 
-      when "class"
-        if isSelected
-          pNode.className = prompt('Class Name:', pNode.className)
+      when "source"
+        @setSourceVal()
+        @$article.hide()
+        $(@source).show()
+        $('.sh5wysiwyg-toolbar > input[value="source"]').hide()
+        $('.sh5wysiwyg-toolbar > input[value="editor"]').show()
+      
+      when "editor"
+        @setEditorVal()
+        $(@source).hide()
+        @$article.show()
+        $('.sh5wysiwyg-toolbar > input[value="editor"]').hide()
+        $('.sh5wysiwyg-toolbar > input[value="source"]').show()

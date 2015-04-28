@@ -9,7 +9,7 @@ do ($ = jQuery) ->
         $(this).data pluginName, new SH5wysiwyg this, options
 
     # Add wrapper div to the empty article(textarea) when focused.
-    $('.sh5wysiwyg-article').off('focus').on 'focus', ->
+    $('.sh5wysiwyg-article').off('focus.sh5').on 'focus.sh5', ->
       sel = document.getSelection()
       return if sel.anchorNode != this
       unless $(this).html()
@@ -24,13 +24,13 @@ do ($ = jQuery) ->
           $(this).find('div:first').remove()
 
     # Execute commands
-    $('.sh5wysiwyg-toolbar > input').off('click').on 'click', ->
+    $('.sh5wysiwyg-toolbar > input').off('click.sh5').on 'click.sh5', ->
       $target = $(this).parent().nextAll(".#{pluginName}:first")
       wysiwyg = $target.data pluginName
       wysiwyg.execCommand $(this).val()
 
     # Upload Image via AJAX and insert to the article(textarea).
-    $('.sh5wysiwyg-file').off('change').on 'change', (e)->
+    $('.sh5wysiwyg-file').off('change.sh5').on 'change.sh5', (e)->
       return if document.getSelection().toString().length > 0
       e.preventDefault()
       fd = new FormData();
@@ -46,3 +46,9 @@ do ($ = jQuery) ->
           document.execCommand('insertImage',false,json.url)
         error: (jqXHR, textStatus, errorThrown)->
           alert "Error textStatus:#{textStatus}, errorThrown:#{errorThrown}"
+
+    # Set articles value to textareas.
+    $(".#{pluginName}").parents('form').off('submit.sh5').on 'submit.sh5', ->
+      $(".#{pluginName}").each ->
+        $(this).data(pluginName).setSourceVal()
+      return false

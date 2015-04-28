@@ -12,8 +12,13 @@ class Toolbar
     @init()
 
   init: ->
+
     for command in @commands
       @element += "<input type='button' value='#{command}'#{@bootstrapBtn}>"
+      if command == "source"
+        @element += "<input type='button' value='editor'#{@bootstrapBtn} style='display: none;'>"
+
     if $.inArray('image', @commands)
       @element += "<input type='file' class='sh5wysiwyg-file' style='position: absolute; top: -50px; left: 0; width: 0; height: 0; opacity: 0; filter: alpha(opacity=0);'>"
+
     @element += "</div>"

@@ -6,24 +6,34 @@
 
     _defaults = {
       bootstrap: false,
-      commands: ['font-size', 'bold', 'color', 'background-color', 'underline', 'link', 'border', 'image', 'movie'],
+      commands: ['font-size', 'bold', 'color', 'background-color', 'underline', 'link', 'border', 'image', 'movie', 'source'],
       minFontSize: 12,
       maxFontSize: 20,
       imageUploadTo: ''
     };
 
-    function SH5wysiwyg(element, options) {
-      this.element = element;
+    function SH5wysiwyg(source, options) {
+      var bootstrapClass;
+      this.source = source;
       this.settings = $.extend({}, _defaults, options);
       this.toolbar = new Toolbar(this.settings.commands, this.settings.bootstrap);
-      this.bootstrapClass = this.settings.bootstrap ? " form-control" : "";
+      bootstrapClass = this.settings.bootstrap ? " form-control" : "";
+      this.$article = $("<article class='sh5wysiwyg-article" + bootstrapClass + "' contentEditable='true'>" + ($(this.source).val()) + "</article>");
       this.init();
     }
 
     SH5wysiwyg.prototype.init = function() {
-      $(this.element).hide();
-      $(this.element).before($(this.toolbar.element));
-      return $(this.element).before($("<article class='sh5wysiwyg-article" + this.bootstrapClass + "' contentEditable='true'>" + ($(this.element).val()) + "</article>"));
+      $(this.source).hide();
+      $(this.source).before($(this.toolbar.element));
+      return $(this.source).before(this.$article);
+    };
+
+    SH5wysiwyg.prototype.setSourceVal = function() {
+      return $(this.source).val(this.$article.html());
+    };
+
+    SH5wysiwyg.prototype.setEditorVal = function() {
+      return this.$article.html($(this.source).val());
     };
 
     SH5wysiwyg.prototype.execCommand = function(command) {
@@ -130,10 +140,18 @@
             }
           }
           break;
-        case "class":
-          if (isSelected) {
-            return pNode.className = prompt('Class Name:', pNode.className);
-          }
+        case "source":
+          this.setSourceVal();
+          this.$article.hide();
+          $(this.source).show();
+          $('.sh5wysiwyg-toolbar > input[value="source"]').hide();
+          return $('.sh5wysiwyg-toolbar > input[value="editor"]').show();
+        case "editor":
+          this.setEditorVal();
+          $(this.source).hide();
+          this.$article.show();
+          $('.sh5wysiwyg-toolbar > input[value="editor"]').hide();
+          return $('.sh5wysiwyg-toolbar > input[value="source"]').show();
       }
     };
 
@@ -156,6 +174,9 @@
       for (i = 0, len = ref.length; i < len; i++) {
         command = ref[i];
         this.element += "<input type='button' value='" + command + "'" + this.bootstrapBtn + ">";
+        if (command === "source") {
+          this.element += "<input type='button' value='editor'" + this.bootstrapBtn + " style='display: none;'>";
+        }
       }
       if ($.inArray('image', this.commands)) {
         this.element += "<input type='file' class='sh5wysiwyg-file' style='position: absolute; top: -50px; left: 0; width: 0; height: 0; opacity: 0; filter: alpha(opacity=0);'>";
@@ -177,7 +198,7 @@
           return $(this).data(pluginName, new SH5wysiwyg(this, options));
         }
       });
-      $('.sh5wysiwyg-article').off('focus').on('focus', function() {
+      $('.sh5wysiwyg-article').off('focus.sh5').on('focus.sh5', function() {
         var $div, range, sel;
         sel = document.getSelection();
         if (sel.anchorNode !== this) {
@@ -196,13 +217,13 @@
           }
         }
       });
-      $('.sh5wysiwyg-toolbar > input').off('click').on('click', function() {
+      $('.sh5wysiwyg-toolbar > input').off('click.sh5').on('click.sh5', function() {
         var $target, wysiwyg;
         $target = $(this).parent().nextAll("." + pluginName + ":first");
         wysiwyg = $target.data(pluginName);
         return wysiwyg.execCommand($(this).val());
       });
-      return $('.sh5wysiwyg-file').off('change').on('change', function(e) {
+      $('.sh5wysiwyg-file').off('change.sh5').on('change.sh5', function(e) {
         var fd;
         if (document.getSelection().toString().length > 0) {
           return;
@@ -224,6 +245,12 @@
             return alert("Error textStatus:" + textStatus + ", errorThrown:" + errorThrown);
           }
         });
+      });
+      return $("." + pluginName).parents('form').off('submit.sh5').on('submit.sh5', function() {
+        $("." + pluginName).each(function() {
+          return $(this).data(pluginName).setSourceVal();
+        });
+        return false;
       });
     };
   })(jQuery);
