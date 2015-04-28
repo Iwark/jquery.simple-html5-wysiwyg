@@ -48,7 +48,7 @@
 
     SH5wysiwyg.prototype.convertThumbToMovie = function() {
       var $source, self;
-      $source = $($(this.source).val());
+      $source = $("<div>" + $(this.source).val() + "</div>");
       self = this;
       $source.find('img.sh5wysiwyg-niconico-thumb').each(function() {
         var movie, url;

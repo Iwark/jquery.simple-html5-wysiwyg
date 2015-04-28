@@ -41,7 +41,7 @@ class SH5wysiwyg
     return this
 
   convertThumbToMovie: ->
-    $source = $($(@source).val())
+    $source = $("<div>" + $(@source).val() + "</div>")
     self = this
     
     # Niconico Movie
