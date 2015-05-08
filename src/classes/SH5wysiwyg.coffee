@@ -133,7 +133,7 @@ class SH5wysiwyg
           nodeName = node.nodeName.toLowerCase()
           interval = Math.round((@settings.maxFontSize - @settings.minFontSize) / 6 * 100) / 100
           newFontSize = @settings.minFontSize + interval * (fontSize - 1)
-          $(node).removeAttr("size").css("font-size", "#{newFontSize}px") if nodeName == "font"
+          @$article.find('*[size]').removeAttr("size").css("font-size", "#{newFontSize}px")
 
       when "bold"
         if isSelected

@@ -128,9 +128,7 @@
             nodeName = node.nodeName.toLowerCase();
             interval = Math.round((this.settings.maxFontSize - this.settings.minFontSize) / 6 * 100) / 100;
             newFontSize = this.settings.minFontSize + interval * (fontSize - 1);
-            if (nodeName === "font") {
-              return $(node).removeAttr("size").css("font-size", newFontSize + "px");
-            }
+            return this.$article.find('*[size]').removeAttr("size").css("font-size", newFontSize + "px");
           }
           break;
         case "bold":
