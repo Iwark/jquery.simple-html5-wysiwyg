@@ -32,20 +32,24 @@ do ($ = jQuery) ->
     # Upload Image via AJAX and insert to the article(textarea).
     $('.sh5wysiwyg-file').off('change.sh5').on 'change.sh5', (e)->
       return if document.getSelection().toString().length > 0
-      e.preventDefault()
-      fd = new FormData();
-      fd.append("file", this.files[0])
-      $.ajax
-        url: options.imageUploadTo
-        type: "POST"
-        data: fd
-        processData: false
-        contentType: false
-        dataType: "json"
-        success: (json)->
-          document.execCommand('insertImage',false,json.url)
-        error: (jqXHR, textStatus, errorThrown)->
-          alert "Error textStatus:#{textStatus}, errorThrown:#{errorThrown}"
+      if !options.imageUploadTo
+        document.execCommand('insertImage',false,e.url)
+      else
+        e.preventDefault()
+        fd = new FormData();
+        fd.append("file", this.files[0])
+        fd.append "addImageLogo", $('#imageAddLogo').prop("checked")
+        $.ajax
+          url: options.imageUploadTo
+          type: "POST"
+          data: fd
+          processData: false
+          contentType: false
+          dataType: "json"
+          success: (json)->
+            document.execCommand('insertImage',false,json.url)
+          error: (jqXHR, textStatus, errorThrown)->
+            alert "Error textStatus:#{textStatus}, errorThrown:#{errorThrown}"
 
     # Set articles value to textareas.
     $(".#{pluginName}").parents('form').off('submit.sh5').on 'submit.sh5', ->

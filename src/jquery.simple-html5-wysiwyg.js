@@ -297,23 +297,28 @@
         if (document.getSelection().toString().length > 0) {
           return;
         }
-        e.preventDefault();
-        fd = new FormData();
-        fd.append("file", this.files[0]);
-        return $.ajax({
-          url: options.imageUploadTo,
-          type: "POST",
-          data: fd,
-          processData: false,
-          contentType: false,
-          dataType: "json",
-          success: function(json) {
-            return document.execCommand('insertImage', false, json.url);
-          },
-          error: function(jqXHR, textStatus, errorThrown) {
-            return alert("Error textStatus:" + textStatus + ", errorThrown:" + errorThrown);
-          }
-        });
+        if (!options.imageUploadTo) {
+          return document.execCommand('insertImage', false, e.url);
+        } else {
+          e.preventDefault();
+          fd = new FormData();
+          fd.append("file", this.files[0]);
+          fd.append("addImageLogo", $('#imageAddLogo').prop("checked"));
+          return $.ajax({
+            url: options.imageUploadTo,
+            type: "POST",
+            data: fd,
+            processData: false,
+            contentType: false,
+            dataType: "json",
+            success: function(json) {
+              return document.execCommand('insertImage', false, json.url);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+              return alert("Error textStatus:" + textStatus + ", errorThrown:" + errorThrown);
+            }
+          });
+        }
       });
       return $("." + pluginName).parents('form').off('submit.sh5').on('submit.sh5', function() {
         return $("." + pluginName).each(function() {
